@@ -9,6 +9,8 @@ public class Sorts {
             System.out.print(arr[i]);
             if (i < arr.length -1){
                 System.out.print(" ");
+            }else {
+                System.out.println("");
             }
         }
     }
@@ -33,10 +35,54 @@ public class Sorts {
         }
     }
 
+    //冒泡排序
+    public static void bubbleSort(int[] arr){
+        int n = arr.length;
+        //方法一
+        /*for (int i = 0; i < n - 1; i++) {
+            for (int j = 0; j < n - i -1; j++) {
+                if (arr[j] > arr[j+1]){
+                    swap(arr, j, j+1);
+                }
+            }
+        }*/
+        //方法二
+        Boolean flag = true;
+        while (flag){
+            flag = false;
+            for (int i = 0; i < n - 1; i++) {
+                if (arr[i] > arr[i+1]){
+                    flag = true;
+                    swap(arr, i, i+1);
+                }
+            }
+        }
+    }
+    //插入排序 砌墙
+    public static void insertionSort(int[] arr){
+        int n = arr.length;
+        for (int i = 1; i < n; i++) {
+            int index = arr[i];
+            int j = i - 1;
+            while (j >= 0 && arr[j] > index){
+                arr[j+1] = arr[j];
+                j--;
+            }
+            arr[j+1] = index;
+        }
+
+    }
+    //计数排序
+    public static void countingSort(int[] arr){
+
+    }
+
 
     public static void main(String[] args) {
         int[] arr = new int[]{8,7,2,1,6,3,9};
-        selectionSort(arr);
+//        selectionSort(arr);
+//        bubbleSort(arr);
+        insertionSort(arr);
         print(arr);
     }
 }
