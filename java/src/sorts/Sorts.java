@@ -74,7 +74,39 @@ public class Sorts {
     }
     //计数排序
     public static void countingSort(int[] arr){
+        int n = arr.length;
+        int max = arr[0];
+//        int min = arr[0];
+        for (int i = 0; i < n; i++) {
+            max = Math.max(max,arr[i]);
+//            min = Math.min(min,arr[i]);
+        }
 
+        int[] r = new int[max+1];
+        for (int i = 0; i < n; i++) {
+            r[arr[i]]++;
+        }
+        int index = 0;
+        //方法一
+        /*for (int i = 0; i < r.length; i++) {
+            for (int i1 = 0; i1 < r[i]; i1++) {
+                arr[index++] = i;
+            }
+        }*/
+
+        //方法二
+        for (int i = 1; i < r.length; i++) {
+            r[i] += r[i-1];
+        }
+
+        int[] t = new int[arr.length];
+        for (int i = arr.length - 1; i >= 0; i--) {
+            t[--r[arr[i]]] = arr[i];
+        }
+
+        for (int i = 0; i < t.length; i++) {
+            arr[index++] = t[i];
+        }
     }
 
 
@@ -82,7 +114,8 @@ public class Sorts {
         int[] arr = new int[]{8,7,2,1,6,3,9};
 //        selectionSort(arr);
 //        bubbleSort(arr);
-        insertionSort(arr);
+//        insertionSort(arr);
+        countingSort(arr);
         print(arr);
     }
 }
