@@ -1,5 +1,6 @@
 package sorts;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class Sorts {
@@ -114,6 +115,109 @@ public class Sorts {
 
     }
 
+    //快速排序
+    public static void quickSort(int[] arr, int begin, int end){
+        if (begin >= end) return ;
+        //方法一
+        /*int index = quickSortIn(arr, left, right);
+        quickSort(arr,left,index - 1);
+        quickSort(arr,index + 1, right);*/
+        //方法二
+        int mid = midThree(arr, begin, end);
+        swap(arr, mid, begin);
+        int[] ints = quickSortInTwo(arr, begin, end);
+        int low = ints[0];
+        int high = ints[1];
+        quickSort(arr,begin, low - 1);
+        quickSort(arr,high + 1, end);
+    }
+
+    public static int quickSortIn(int[] arr, int left, int right){
+        int prev = left + 1;
+        int cur = prev + 1;
+        int key = arr[left];
+        while (cur <= right){
+            if (arr[cur] < key){
+                swap(arr, prev, cur);
+                prev++;
+            }
+            cur++;
+        }
+        swap(arr, left, prev);
+        return prev;
+    }
+    //快速排序优化版 荷兰国旗分区(红、白、蓝)
+    public static int[] quickSortInTwo(int[] arr, int left, int right){
+        int key = arr[left];
+        int cur = left + 1;
+        while (cur <= right){
+            if (arr[cur] < key){
+                swap(arr, left++, cur++);
+            }else if (arr[cur] > key){
+                swap(arr, cur, right--);
+            }else {
+                cur++;
+            }
+        }
+        return new int[]{left, right};
+    }
+
+    //取三者中的中间值
+    public static int midThree(int[] arr, int left, int right){
+        int mid = (left + right) / 2;
+        if (arr[left] < arr[mid]){
+            if (arr[mid] < arr[right]){
+                return mid;
+            } else {
+                if (arr[left] < arr[right]){
+                    return right;
+                }else {
+                    return left;
+                }
+            }
+        }else {
+            if (arr[mid] > arr[right]){
+                return mid;
+            }else {
+                if (arr[left] < arr[right]){
+                    return left;
+                }else {
+                    return right;
+                }
+            }
+        }
+        /*int mid = (left + right) / 2;
+        if (arr[left] < arr[mid])
+        {
+            if (arr[mid] < arr[right])
+            {
+                return mid;
+            }
+            else if (arr[left] > arr[right])
+            {
+                return left;
+            }
+            else
+            {
+                return right;
+            }
+        }
+        else   //arr[left] > arr[mid]
+        {
+            if (arr[mid] > arr[right])
+            {
+                return mid;
+            }
+            else if (arr[left] < arr[right])
+            {
+                return left;
+            }
+            else
+            {
+                return right;
+            }
+        }*/
+    }
 
 
     public static void main(String[] args) {
@@ -121,7 +225,8 @@ public class Sorts {
 //        selectionSort(arr);
 //        bubbleSort(arr);
 //        insertionSort(arr);
-        countingSort(arr);
+//        countingSort(arr);
+        quickSort(arr, 0, arr.length - 1);
         print(arr);
     }
 }
