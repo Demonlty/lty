@@ -2,6 +2,7 @@ package sorts;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 public class Sorts {
 
@@ -21,19 +22,48 @@ public class Sorts {
         arr[i] = arr[j];
         arr[j] = temp;
     }
+    //生成随机数组
+    public static int[] generateRandomArray(){
+        int[] arr = new int[10000];
+        for (int i = 0; i < arr.length; i++) {
+            new Random().nextInt(arr.length);
+            arr[i] = new Random().nextInt(arr.length);
+        }
+        return arr;
+    }
+
+    //正常程序排序
+    public static int[] Sort(int[] arr){
+        int[] a = new int[arr.length];
+        System.arraycopy(arr, 0, a, 0, arr.length);
+        Arrays.sort(a);
+        return a;
+    }
+
+    //对数器检查
+    public static boolean checkSort(int[] arr, int[] arr1){
+        boolean flag = true;
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] != arr1[i]) {
+                flag = false;
+            }
+        }
+        return flag;
+    }
+
     //8,7,2,1,6,3,9
     //0 1 2 3 4 5 6
     //选择排序
     public static void selectionSort(int[] arr){
         int n = arr.length;
         //注意边界问题 n-1
-        /*for (int i = 0; i < n - 1; i++) {
+        for (int i = 0; i < n - 1; i++) {
             int r = i;
             for (int j = i + 1; j < n; j++) {
                 r = arr[j] < arr[r] ? j : r;
             }
             swap(arr, i, r);
-        }*/
+        }
         //双向选择排序
         /*for (int i = 0; i < n/2; i++) {
             int minPos = i, maxPos = n - i -1;
@@ -48,7 +78,7 @@ public class Sorts {
             print(arr);
         }*/
         //双向选择排序
-        int left = 0, right = n -1;
+        /*int left = 0, right = n -1;
         while (left < right){
             int minPos = left, maxPos = left;
             for (int j = left ; j <= right; j++){
@@ -61,7 +91,7 @@ public class Sorts {
             swap(arr, right, maxPos);
             left++;
             right--;
-        }
+        }*/
     }
 
     //冒泡排序
@@ -249,12 +279,21 @@ public class Sorts {
 
 
     public static void main(String[] args) {
-        int[] arr = new int[]{8,7,2,1,6,3,9};
-        selectionSort(arr);
+        int n = 100;
+        boolean flag = true;
+        for (int i = 0; i < n; i++) {
+
+//        int[] arr = new int[]{8,7,2,1,6,3,9};
+            int[] arr = generateRandomArray();
+            int[] sort = Sort(arr);
+            selectionSort(arr);
 //        bubbleSort(arr);
 //        insertionSort(arr);
 //        countingSort(arr);
 //        quickSort(arr, 0, arr.length - 1);
-        print(arr);
+            flag = checkSort(sort, arr);
+//        print(arr);
+        }
+        System.out.println(flag);
     }
 }
