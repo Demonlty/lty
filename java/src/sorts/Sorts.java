@@ -21,18 +21,46 @@ public class Sorts {
         arr[i] = arr[j];
         arr[j] = temp;
     }
-
+    //8,7,2,1,6,3,9
+    //0 1 2 3 4 5 6
     //选择排序
     public static void selectionSort(int[] arr){
         int n = arr.length;
-        for (int i = 0; i < n; i++) {
+        //注意边界问题 n-1
+        /*for (int i = 0; i < n - 1; i++) {
             int r = i;
             for (int j = i + 1; j < n; j++) {
-                if (arr[j] < arr[r]){
-                    r = j;
-                }
+                r = arr[j] < arr[r] ? j : r;
             }
             swap(arr, i, r);
+        }*/
+        //双向选择排序
+        /*for (int i = 0; i < n/2; i++) {
+            int minPos = i, maxPos = n - i -1;
+            for (int j = i ; j < n - i; j++){
+                minPos = arr[j]  < arr[minPos] ? j : minPos;
+                maxPos = arr[j] > arr[maxPos] ? j : maxPos;
+            }
+            swap(arr, i, minPos);
+            //修正位置
+            if (maxPos == i) maxPos = minPos;
+            swap(arr, n - i -1, maxPos);
+            print(arr);
+        }*/
+        //双向选择排序
+        int left = 0, right = n -1;
+        while (left < right){
+            int minPos = left, maxPos = left;
+            for (int j = left ; j <= right; j++){
+                minPos = arr[j]  < arr[minPos] ? j : minPos;
+                maxPos = arr[j] > arr[maxPos] ? j : maxPos;
+            }
+            swap(arr, left, minPos);
+            //修正位置
+            if (maxPos == left) maxPos = minPos;
+            swap(arr, right, maxPos);
+            left++;
+            right--;
         }
     }
 
@@ -222,11 +250,11 @@ public class Sorts {
 
     public static void main(String[] args) {
         int[] arr = new int[]{8,7,2,1,6,3,9};
-//        selectionSort(arr);
+        selectionSort(arr);
 //        bubbleSort(arr);
 //        insertionSort(arr);
 //        countingSort(arr);
-        quickSort(arr, 0, arr.length - 1);
+//        quickSort(arr, 0, arr.length - 1);
         print(arr);
     }
 }
