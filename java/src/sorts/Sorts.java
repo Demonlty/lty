@@ -105,8 +105,15 @@ public class Sorts {
                 }
             }
         }*/
+        for (int i = n - 1; i > 0; i--) {
+            for (int j = 0; j < i; j++) {
+                if (arr[j] > arr[j+1]){
+                    swap(arr, j, j+1);
+                }
+            }
+        }
         //方法二
-        Boolean flag = true;
+        /*Boolean flag = true;
         while (flag){
             flag = false;
             for (int i = 0; i < n - 1; i++) {
@@ -115,9 +122,9 @@ public class Sorts {
                     swap(arr, i, i+1);
                 }
             }
-        }
+        }*/
     }
-    //插入排序 砌墙
+    //插入排序 扑克牌 从右往左插入
     public static void insertionSort(int[] arr){
         int n = arr.length;
         for (int i = 1; i < n; i++) {
@@ -131,6 +138,28 @@ public class Sorts {
         }
 
     }
+
+    //希尔排序
+    public static void shellSort(int[] arr){
+        int n = arr.length;
+        //Kunth序列 h = 3*h + 1
+        int h = 1;
+        while (h < n/3) {
+            h = h * 3 + 1;
+        }
+        for (int gap = h; gap > 0; gap = (gap - 1) / 3) {
+            for (int i = gap; i < n; i++) {
+                int temp = arr[i];
+                int j = i - gap;
+                while (j >= 0 && temp < arr[j]) {
+                    arr[j+gap] = arr[j];
+                    j -= gap;
+                }
+                arr[j+gap] = temp;
+            }
+        }
+    }
+
     //计数排序
     public static void countingSort(int[] arr){
         int n = arr.length;
@@ -279,21 +308,25 @@ public class Sorts {
 
 
     public static void main(String[] args) {
-        int n = 100;
+        int n = 10;
         boolean flag = true;
+        long l = System.currentTimeMillis();
         for (int i = 0; i < n; i++) {
 
 //        int[] arr = new int[]{8,7,2,1,6,3,9};
             int[] arr = generateRandomArray();
             int[] sort = Sort(arr);
-            selectionSort(arr);
+//            selectionSort(arr);
 //        bubbleSort(arr);
+            shellSort(arr);
 //        insertionSort(arr);
 //        countingSort(arr);
 //        quickSort(arr, 0, arr.length - 1);
             flag = checkSort(sort, arr);
 //        print(arr);
         }
+        long r = System.currentTimeMillis();
         System.out.println(flag);
+        System.out.println("time: " + (r-l));
     }
 }
