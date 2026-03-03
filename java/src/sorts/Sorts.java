@@ -23,11 +23,12 @@ public class Sorts {
         arr[j] = temp;
     }
     //生成随机数组
-    public static int[] generateRandomArray(){
-        int[] arr = new int[10000];
+    public static int[] generateRandomArray(int maxSize, int maxValue) {
+        //Math.random() -> [0.1) 所有的小数，等概率返回一个
+        int[] arr = new int[(int) ((maxSize + 1) * Math.random())];
         for (int i = 0; i < arr.length; i++) {
-            new Random().nextInt(arr.length);
-            arr[i] = new Random().nextInt(arr.length);
+            arr[i] = (int) ((maxValue + 1) * Math.random()) - (int) (maxValue * Math.random());
+            arr[i] = Math.abs(arr[i]);
         }
         return arr;
     }
@@ -127,7 +128,7 @@ public class Sorts {
     //插入排序 扑克牌 从右往左插入
     public static void insertionSort(int[] arr){
         int n = arr.length;
-        for (int i = 1; i < n; i++) {
+        /*for (int i = 1; i < n; i++) {
             int index = arr[i];
             int j = i - 1;
             while (j >= 0 && arr[j] > index){
@@ -135,8 +136,12 @@ public class Sorts {
                 j--;
             }
             arr[j+1] = index;
+        }*/
+        for (int i = 1; i < n; i++) {
+            for (int j = i - 1; j >= 0 && arr[j] > arr[j + 1]; j--) {
+                swap(arr, j, j + 1);
+            }
         }
-
     }
 
     //希尔排序
@@ -197,18 +202,13 @@ public class Sorts {
         }
     }
 
-    //基数排序 关键字排序
-    public static void radixSort(){
-
-    }
-
     //快速排序
-    public static void quickSort(int[] arr, int begin, int end){
+    /*public static void quickSort(int[] arr, int begin, int end){
         if (begin >= end) return ;
         //方法一
-        /*int index = quickSortIn(arr, left, right);
+        *//*int index = quickSortIn(arr, left, right);
         quickSort(arr,left,index - 1);
-        quickSort(arr,index + 1, right);*/
+        quickSort(arr,index + 1, right);*//*
         //方法二
         int mid = midThree(arr, begin, end);
         swap(arr, mid, begin);
@@ -217,7 +217,7 @@ public class Sorts {
         int high = ints[1];
         quickSort(arr,begin, low - 1);
         quickSort(arr,high + 1, end);
-    }
+    }*/
 
     public static int quickSortIn(int[] arr, int left, int right){
         int prev = left + 1;
@@ -306,6 +306,145 @@ public class Sorts {
         }*/
     }
 
+    //快速排序（荷兰国旗版）
+    public static void quickSort(int[] arr, int L, int R){
+        if (L < R){
+            //去随机值交换位置
+            Sorts.swap(arr, L + (int) (Math.random() * (R - L + 1)), R);
+            int[] partition = partition(arr, L, R);
+            quickSort(arr, L, partition[0] - 1);
+            quickSort(arr, partition[1] + 1, R);
+        }
+    }
+    public static int[] partition(int[] arr, int L, int R){
+        int less = L -1;
+        int more = R;
+        while (L < more){
+            if (arr[L] < arr[R]){
+                Sorts.swap(arr, ++less, L++);
+            }else if (arr[L] > arr[R]){
+                Sorts.swap(arr, --more, L);
+            }else {
+                L++;
+            }
+        }
+        Sorts.swap(arr, more, R);
+        return new int[]{less + 1, more};
+    }
+
+    //归并排序
+    public static void mergeSort(int[] arr){
+        if (arr == null || arr.length < 2) return;
+        int n = arr.length;
+        process(arr, 0, n-1);
+    }
+    public static void process(int[] arr, int L, int R){
+        if (L == R){
+            return;
+        }
+        int mid = L + ((R - L) >> 1);
+        process(arr, L, mid);
+        process(arr, mid + 1, R);
+        merge(arr, L, mid, R);
+    }
+    public static void merge(int[] arr, int L, int mid, int R){
+        int[] help = new  int[R - L + 1];
+        int i = 0;
+        int p1 =  L;
+        int p2 = mid + 1;
+        while (p1 <= mid && p2 <= R){
+            help[i++] = arr[p1] <= arr[p2] ? arr[p1++] : arr[p2++];
+        }
+        while (p1 <= mid){
+            help[i++] = arr[p1++];
+        }
+        while (p2 <= R){
+            help[i++] = arr[p2++];
+        }
+        for (i = 0; i < help.length; i++){
+            arr[L + i] = help[i];
+        }
+    }
+
+    //堆排序
+    //树左孩子 （2*i）+1
+    //树右孩子 （2*i）+2
+    //树父节点 （i-1）/2
+    public static void heapSort(int[] arr){
+        if (arr == null || arr.length < 2) return;
+        //转化大根堆 方法一
+//        for (int i = 0; i < arr.length; i++) {
+//            heapInsert(arr, i);
+//        }
+        //转化大根堆 方法二
+        for (int i = arr.length - 1; i >= 0; i--) {
+            heapIfy(arr, i, arr.length);
+        }
+        //排序
+        int heapSize = arr.length;
+        swap(arr, 0, --heapSize);
+        while (heapSize > 0){
+            heapIfy(arr, 0, heapSize);
+            swap(arr, 0, --heapSize);
+        }
+    }
+    public static void heapInsert(int[] arr,int index){
+        while (arr[index] > arr[(index - 1) / 2]){
+            swap(arr, index, (index - 1) / 2);
+            index = (index - 1) / 2;
+        }
+    }
+    public static void heapIfy(int[] arr,int index, int heapSize){
+        //左孩子
+        int left = index * 2 + 1;
+        //判断是否有孩子存在
+        while (left < heapSize){
+            //取左右孩子的最大值的位置
+            int largest = left + 1 < heapSize && arr[left + 1] > arr[left] ? left + 1 : left;
+            //与父节点比较，取最大值的位置并和父节点交换
+            largest = arr[largest] > arr[index] ?  largest : index;
+            swap(arr, largest, index);
+            if (largest == index){
+                break;
+            }
+            index = largest;
+            left = index * 2 + 1;
+        }
+    }
+
+    //基数排序
+    public static void radixSort(int[] arr, int L, int R, int digit){
+        final int radix = 10;
+        int i = 0, j = 0;
+        int[] bucket = new int[R - L + 1];
+
+        for (int d = 1; d <= digit; d++){
+
+            int[] count = new int[radix];
+
+            for (i = L; i <= R; i++){
+                j = getDigit(arr[i], d);
+                count[j]++;
+            }
+            for (j = 1; j < radix; j++){
+                count[j] += count[j - 1];
+            }
+
+            for (i = R; i >= L; i--){
+                j = getDigit(arr[i], d);
+                bucket[count[j]-1] = arr[i];
+                count[j]--;
+            }
+            for (i = L, j = 0; i <= R; i++, j++){
+                arr[i] = bucket[j];
+            }
+        }
+
+    }
+
+    private static int getDigit(int x, int d) {
+        return ((Math.abs(x) / ((int) Math.pow(10, d -1))) % 10);
+    }
 
     public static void main(String[] args) {
         int n = 10;
@@ -314,14 +453,18 @@ public class Sorts {
         for (int i = 0; i < n; i++) {
 
 //        int[] arr = new int[]{8,7,2,1,6,3,9};
-            int[] arr = generateRandomArray();
+            int[] arr = generateRandomArray(100,1000);
             int[] sort = Sort(arr);
 //            selectionSort(arr);
 //        bubbleSort(arr);
-            shellSort(arr);
+//            shellSort(arr);
 //        insertionSort(arr);
 //        countingSort(arr);
 //        quickSort(arr, 0, arr.length - 1);
+//            mergeSort(arr);
+//            quickSort(arr,0,arr.length-1);
+//            heapSort(arr);
+            radixSort(arr,0, arr.length - 1, 3);
             flag = checkSort(sort, arr);
 //        print(arr);
         }
