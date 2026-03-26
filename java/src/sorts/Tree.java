@@ -6,10 +6,10 @@ import java.util.LinkedList;
 public class Tree {
 
 
-    static class Node{
-        int value;
-        Node left;
-        Node right;
+    public static class Node{
+        public int value;
+        public Node left;
+        public Node right;
 
         public Node(int value) {
             this.value = value;

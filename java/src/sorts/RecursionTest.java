@@ -198,6 +198,44 @@ public class RecursionTest {
         //i == 3 ~ 9
         return process(str,i+1); //i作为单独的部分转化，后续有多少方法
     }
+    //i位置上有多少转化方法，i位置之前的都已做好决定
+    //优化版本
+    public static int process2(char[] str, int i) {
+        if (i == str.length) {
+            return 1; //i位置之前的都已做好决定，i是最后一个，那方法只有一种
+        }
+        if (str[i] == '0') {
+            return 0; //i位置之前的都已做好决定，i是最后一个且为0不合法，那总体看这个转化方法不合法，即为0
+        }
+        int res = process(str, i + 1); //i作为单独的部分转化，后续有多少方法
+        if (i == str.length - 1) { //i为最后的一个字符
+            return res;
+        }
+        if (((str[i] - '0') * 10 + (str[i + 1] - '0')) < 27) {
+            res += process(str, i + 2); //（i和i+1）作为单独的部分，后续有多少方法
+        }
+        return res; //i作为单独的部分转化，后续有多少方法
+    }
+    //i位置上有多少转化方法，i位置之前的都已做好决定
+    //继续优化，dp版本
+    public static int process3(char[] str) {
+        if (str == null || str.length == 0){
+            return 0;
+        }
+        int len = str.length;
+        int[] dp = new int[len+1]; //dp[length+1] 可以取到值
+        dp[len] = 1;
+        dp[len - 1] = str[len - 1] == '0' ? 0 : 1;
+        for (int i = len - 2; i >= 0 ; i--) {
+            if (str[i] == '0'){
+                dp[i] = 0;
+            }else {
+                dp[i] = dp[i + 1]
+                        + ((str[i] - '0') * 10 + (str[i + 1] - '0')) < 27 ? dp[i+2] : 0;
+            }
+        }
+        return dp[0]; //i作为单独的部分转化，后续有多少方法
+    }
 
     //货物选择，重量：weight[i]，价值：values[i]，自由选择，返回最大价值
     //重量不查过 bag

@@ -500,6 +500,197 @@ public class Tree1 {
     }
 
 
+    //树形DP套路
+
+    //二叉树节点间的最大距离问题
+    //左树--》 最大距离、高度
+    //右树--》 最大距离、高度
+    //根节点--》最大距离：Math.max（左树最大距离，右树最大距离，左树高度+1+右树高度）
+    //         高度：Math.max（左树高度，右树高度）+1
+
+    //多叉树的宴会最大快乐值
+    //子节点 来的话的最大快乐值，不来的话的最大快乐值
+
+
+    /**
+     * Morris遍历 时间复杂度O（n），空间复杂度O（1）
+     * 先序：只能到达一次（没有左树），直接打印；如能两次，第一次时（左树右边界的右节点指null）打印；
+     * 中序：只能到达一次（没有左树），直接打印；如能两次，第二次时（左树右边界的右节点指当前节点）打印；
+     * 后序：只在能过两次，第二次时逆序打印左树右边界；最后单独逆序打印整棵树的右边界
+     */
+    public static void morris(Node head){
+        if (head == null){
+            return;
+        }
+        Node cur = head;
+        Node mostRight = null;
+        while (cur != null){
+            mostRight = cur.left;
+            if (mostRight != null){ //有左子树
+                while (mostRight.right != null && mostRight.right != cur){
+                    mostRight = mostRight.right;
+                }
+                // mostRight目前是cur左子树的最右节点
+                if (mostRight.right == null){
+                    //第一次来到cur节点
+                    mostRight.right = cur;
+                    cur = cur.left;
+                    continue;
+                }else { //mostRight.right == cur  第二次回到从cur节点
+                    mostRight.right = null;
+                }
+            }
+            cur = cur.right;
+        }
+    }
+    //先序
+    public static void preMorris(Node head){
+        if (head == null){
+            return;
+        }
+        Node cur = head;
+        Node mostRight = null;
+        while (cur != null){
+            mostRight = cur.left;
+            if (mostRight != null){ //有左子树
+                while (mostRight.right != null && mostRight.right != cur){
+                    mostRight = mostRight.right;
+                }
+                // mostRight目前是cur左子树的最右节点
+                if (mostRight.right == null){
+                    //第一次来到cur节点
+                    System.out.println(cur);
+                    mostRight.right = cur;
+                    cur = cur.left;
+                    continue;
+                }else { //mostRight.right == cur  第二次回到从cur节点
+                    mostRight.right = null;
+                }
+            }else {
+                System.out.println(cur);
+            }
+            cur = cur.right;
+        }
+    }
+    //中序
+    public static void inMorris(Node head){
+        if (head == null){
+            return;
+        }
+        Node cur = head;
+        Node mostRight = null;
+        while (cur != null){
+            mostRight = cur.left;
+            if (mostRight != null){ //有左子树
+                while (mostRight.right != null && mostRight.right != cur){
+                    mostRight = mostRight.right;
+                }
+                // mostRight目前是cur左子树的最右节点
+                if (mostRight.right == null){
+                    //第一次来到cur节点
+                    mostRight.right = cur;
+                    cur = cur.left;
+                    continue;
+                }else { //mostRight.right == cur  第二次回到从cur节点
+                    mostRight.right = null;
+                }
+            }
+            System.out.println(cur);
+            cur = cur.right;
+        }
+    }
+    //后序
+    public static void posMorris(Node head){
+        if (head == null){
+            return;
+        }
+        Node cur = head;
+        Node mostRight = null;
+        while (cur != null){
+            mostRight = cur.left;
+            if (mostRight != null){ //有左子树
+                while (mostRight.right != null && mostRight.right != cur){
+                    mostRight = mostRight.right;
+                }
+                // mostRight目前是cur左子树的最右节点
+                if (mostRight.right == null){
+                    //第一次来到cur节点
+                    mostRight.right = cur;
+                    cur = cur.left;
+                    continue;
+                }else { //mostRight.right == cur  第二次回到从cur节点
+                    mostRight.right = null;
+                    //逆序打印左树的右边界
+                    printEdge(cur.left);
+                }
+            }
+            cur = cur.right;
+        }
+        //逆序打印这颗树的右边界
+        printEdge(head);
+    }
+    //已x为头的树，逆序打印这棵树的右边界
+    public static void printEdge(Node x){
+        Node tail = reverseEdge(x);
+        Node cur = tail;
+        while (cur != null){
+            System.out.println(cur.value);
+            cur = cur.right;
+        }
+        reverseEdge(tail);
+    }
+    //逆序
+    public static Node reverseEdge(Node from){
+        Node pre = null;
+        Node next = null;
+        while (from != null){
+            next = from.right;
+            from.right = pre;
+            pre = from;
+            from = next;
+        }
+        return pre;
+    }
+
+    //是否是搜索二叉树
+    public static boolean isBTS(Node head){
+        if (head == null){
+            return true;
+        }
+        Node cur = head;
+        Node mostRight = null;
+        int preValue = Integer.MIN_VALUE;
+        while (cur != null){
+            mostRight = cur.left;
+            if (mostRight != null){ //有左子树
+                while (mostRight.right != null && mostRight.right != cur){
+                    mostRight = mostRight.right;
+                }
+                // mostRight目前是cur左子树的最右节点
+                if (mostRight.right == null){
+                    //第一次来到cur节点
+                    mostRight.right = cur;
+                    cur = cur.left;
+                    continue;
+                }else { //mostRight.right == cur  第二次回到从cur节点
+                    mostRight.right = null;
+                }
+            }
+            if (cur.value <= preValue){
+                return false;
+            }
+            preValue = cur.value;
+            cur = cur.right;
+        }
+        return true;
+    }
+
+    /**
+     * 有序表
+     * */
+    //BST（搜索二叉树）
+
+
     public static void main(String[] args) {
         int[] arr = new int[]{1,2,3,4,5,6,7};
         Node node = new Node(arr[0]);
