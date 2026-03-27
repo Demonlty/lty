@@ -4,6 +4,7 @@ import sorts.Tree;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.TreeMap;
 
 public class Test_20260326 {
@@ -356,13 +357,20 @@ public class Test_20260326 {
         }
         int N = pre.length;
         int[] pos = new int[N];
-        set(pre,in,pos,0,N-1,0,N-1,0,N-1);
+        //优化
+        HashMap<Integer,Integer> inMap = new HashMap<>();
+        for (int i = 0; i < in.length; i++) {
+            inMap.put(in[i],i);
+        }
+        set(pre,in,pos,0,N-1,0,N-1,0,N-1,inMap);
         return pos;
     }
+    //O（N）
     private static void set(int[] pre, int[] in, int[] pos,
                             int prei, int prej,
                             int ini, int inj,
-                            int posi, int posj) {
+                            int posi, int posj,
+                            HashMap<Integer,Integer> inMap) {
         if (prei > prej){
             return;
         }
@@ -371,18 +379,113 @@ public class Test_20260326 {
         }
         //先确定头节点位置，再分割左右树的位置边界
         pos[posj] = pre[prei];
-        int find = ini;
-        for (; find <= inj; find++) {
-            if (in[find] == pre[prei]){
-                break;
-            }
-        }
+//        int find = ini;
+//        for (; find <= inj; find++) {
+//            if (in[find] == pre[prei]){
+//                break;
+//            }
+//        }
+        //优化，加速
+        int find = inMap.get(pre[prei]);
         //左树
-        set(pre,in,pos,prei+1,prei+find-ini,ini,find-1,prei,prei+find-ini-1);
+        set(pre,in,pos,prei+1,prei+find-ini,ini,find-1,prei,prei+find-ini-1,inMap);
         //右树
-        set(pre,in,pos,prei+find-ini+1,prej,find+1,inj,prei+find-ini,posj-1);
+        set(pre,in,pos,prei+find-ini+1,prej,find+1,inj,prei+find-ini,posj-1,inMap);
     }
 
+    //求完全二叉数的节点个数
+    public static int nodeNum(Tree.Node head){
+        if (head == null){
+            return 0;
+        }
+        return bs(head , 1, mostLeftLevel(head,1));
+    }
+    //头节点为node的完全二叉树的节点个数
+    //node在head树的level层，head树的总深度为h（定值）
+    //O（h^2） h = logN  --> O((logN)^2) < O(N)
+    private static int bs(Tree.Node node, int level, int h) {
+        if (level == h){ //最后一层，叶子节点
+            return 1;
+        }
+        if (mostLeftLevel(node.right,level+1) == h){//此节点的右树的最左节点到最后一层，代表此节点的左树是满二叉树
+            //此时level是头节点的层数，那左树的高度为 h-level，即左树的节点为 2^(h-level) - 1
+            //返回左树节点个数（2^(h-level) - 1）+ 头节点（1） + 右树节点个数（bs（右树））
+            return (1 << (h - level)) + bs(node.right,level+1,h);
+        }else { //此节点的右树的最左节点不到最后一层，那代表此节点的右树是满二叉树
+            //返回左树节点个数（bs（左树））+ 头节点（1）+ 右树节点个数（2^(h - 1 - level) - 1）
+            return bs(node.left,level+1,h) + (1 << (h - 1 - level));
+        }
+    }
+    //求node为头节点的完全二叉树的深度
+    //N = h^2 - 1 --> O(logN)
+    private static int mostLeftLevel(Tree.Node node, int level) {
+        while (node != null){
+            level++;
+            node = node.left;
+        }
+        return level - 1;
+    }
+
+    //最长递增子序列问题，最小结尾构建单调性 时间：O(n*log n) 空间：O(n)
+    //arr[]
+    //dp[]  只使用dp[]是经典做法
+    //ends[]  ends[i] 代表长度i+1的递增子序列的最小的结尾，
+    //来到arr[i]位置时，在ends[]中二分找比arr[i]大的且是最小的那个值（假如为ends[j]）
+    //1、存在这个值，更新ends[j]为arr[i] 代表 j+1长度的最小结尾是arr[i]，那么arr[i]的dp值为j+1
+    //2、不存在这个值，ends[]中新加入arr[i] 代表 此时ends的有效程度为k的话，K+1长度的最小结尾是arr[i]，那么arr[i]的dp值为K+1
+    public static int getMax(int[] arr){
+        if (arr == null || arr.length == 0){
+            return 0;
+        }
+        int N = arr.length;
+//        int[] dp = new int[N];
+        int[] ends = new int[N];
+        int k = 0; //ends 当前的有效长度（也是当前最长递增子序列长度）
+//        int maxLen = 0;
+        for (int i = 0; i < N; i++) {
+            int j = binarySearch(ends,arr[i],k);
+            if (j == -1){ //ends[]中没有g(ends,arr[i])
+                ends[k] = arr[i];
+//                dp[i] = k + 1;
+                k++;
+            }else {
+                ends[j] = arr[i];
+//                dp[i] = j + 1;
+            }
+//            maxLen = Math.max(maxLen,dp[i]);
+        }
+//        return maxLen;
+        return k;
+    }
+    //二分找大于n的最小的值的位置，找不到返回-1;
+    public static int binarySearch(int[] arr, int n, int len){
+        if (arr == null || arr.length == 0 || len == 0) {
+            return -1;
+        }
+        int left = 0;
+        int right = len - 1;
+        int result = -1;  // 记录当前找到的最小满足条件的索引
+
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+
+            if (arr[mid] > n) {
+                // 找到一个大于 n 的元素，尝试找更左边的（更小的索引）
+                result = mid;
+                right = mid - 1;
+            } else {
+                // arr[mid] <= n，需要往右边找更大的值
+                left = mid + 1;
+            }
+        }
+        return result;
+    }
+
+    //3的倍数
+    //1024是不是3的倍数
+    //(1+0+2+4) % 3 == 0
+    //123456789101112131415...9899100 是不是3的倍数
+    //(1+2+3+4+5+6+7+8+9+10+11+12+13+...+98+99+100) % 3 == 0
 
     public static void main(String[] args) {
 
