@@ -6,9 +6,9 @@ import java.util.*;
 
 public class LinkedList {
 
-    class Node {
+    public class Node {
         int val;
-        Node next;
+        public Node next;
 
         public Node() {
         }
