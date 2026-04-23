@@ -148,7 +148,7 @@ public class Test_20260328 {
         int l = longs.length;
 
         if (k <= s){
-            getUpMedian(shorts,0,k-1,shorts,0,k-1);
+            return getUpMedian(shorts,0,k-1,shorts,0,k-1);
         }
         if (k > l){
             if (longs[k - s - 1] >= shorts[s - 1]){

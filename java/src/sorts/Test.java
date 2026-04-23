@@ -10,7 +10,7 @@ public class Test {
     //异或运算 相同为0 不同为1
 
 
-    //一堆数中，一种数出现奇数次，其他都是偶数次
+    //一堆数中，一种数出现奇数次，其他都是偶数次，结果为全部异或和
     public static int printNum1(int[] arr){
         if (arr.length < 3){
             return 0;

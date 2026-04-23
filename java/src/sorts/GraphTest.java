@@ -140,7 +140,10 @@ public class GraphTest {
     }
 
     //最小生成树
-    //kruska算法
+    //Kruskal算法
+    //1、将图中所有边按权重从小到大排序。
+    //2、依次取出每条边，若该边连接的两个顶点当前不属于同一个连通分量（即加入后不会形成环）（并查集），则选择这条边加入最小生成树。
+    //3、重复直到选够 V-1 条边（V 为顶点数）。
     public static void K(Graph graph){
         StringBuilder builder = new StringBuilder("最小生成树顺序：");
         if (graph == null){
@@ -148,24 +151,92 @@ public class GraphTest {
             System.out.println(builder);
             return;
         }
-        HashSet<Node> set = new HashSet<>();
         //图的所有边进行堆排序
         PriorityQueue<Edge> minHeap = new PriorityQueue<>(new Comparator<Edge>() {
             @Override
             public int compare(Edge o1, Edge o2) {
-                return o1.weight - o1.weight;
+                return o1.weight - o2.weight;
             }
         });
         for (Edge cur : graph.edges){
             minHeap.offer(cur);
         }
+        List<Node> nodeList = new ArrayList<>();
+        for (Integer node : graph.nodes.keySet()){
+            nodeList.add(graph.nodes.get(node));
+        }
+        HashTest.UnionFindSet unionFindSet = new HashTest.UnionFindSet(nodeList);
 
+        List<Edge> res = new ArrayList<>();
+        while (!minHeap.isEmpty()){
+            Edge curEdge = minHeap.poll();
+            boolean same = unionFindSet.isSameSet(curEdge.from, curEdge.to);
+            if (!same){
+                unionFindSet.union(curEdge.from, curEdge.to);
+                res.add(curEdge);
+                builder.append(curEdge.from + "-->");
+                if (res.size() == nodeList.size() - 1){ //节点的总数 == n ，已得到 n-1 条边，生成树完成
+                    builder.append(curEdge.to);
+                    break;
+                }
+            }
+        }
+        if (res.size() != nodeList.size() - 1){
+            System.out.println(new StringBuilder("最小生成树顺序：原图不连通，不存在最小生成树"));
+            return;
+        }
+        System.out.println(builder);
     }
 
     //最小生成树
     //prim算法
+    //任选一个起始顶点（例如 0），将其加入“已访问集合”。
+    //维护一个最小堆（优先队列），存储所有从已访问集合指向未访问顶点的边，按权重排序。
+    //每次从堆中取出权重最小的边 (u, v, w)，如果 v 尚未被访问，则选择该边加入 MST，并标记 v 为已访问。
+    //将新访问的顶点 v 的所有邻接边中，指向未访问顶点的边加入堆。
+    //重复直到所有顶点都被访问，或堆为空（图不连通）。
+    public static List<Node> prim(Graph graph){
+        if (graph == null){
+            return null;
+        }
+        //图的所有边进行堆排序
+        PriorityQueue<Edge> minHeap = new PriorityQueue<>(new Comparator<Edge>() {
+            @Override
+            public int compare(Edge o1, Edge o2) {
+                return o1.weight - o2.weight;
+            }
+        });
+        List<Node> res = new ArrayList<>();
+        //由点找边
+        Node node = graph.nodes.get(0);
+        res.add(node);
+        for (Edge cur : node.edges){
+            minHeap.offer(cur);
+        }
+        int n = graph.nodes.size();
+        boolean[] visited = new boolean[n];
 
-    //Dijikstra算法 适用范围：没有累加和为负数的环
+        while (!minHeap.isEmpty()){
+            //有最小的边找新的点
+            Edge curEdge = minHeap.poll();
+            if (!visited[curEdge.to.value]){
+                res.add(curEdge.to);
+                visited[curEdge.to.value] = true;
+                for (Edge cur : curEdge.to.edges){
+                    if (!visited[cur.to.value]){
+                        minHeap.offer(cur);
+                    }
+                }
+            }
+        }
+        if (res.size() != n){
+            return null;
+        }
+        return res;
+    }
+
+
+    //Dijkstra算法 适用范围：没有累加和为负数的环
     public static HashMap<Node,Integer> Dijikstra(Node start){
         HashMap<Node,Integer> distanceMap = new HashMap<>();
         distanceMap.put(start,0);

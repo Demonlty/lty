@@ -29,7 +29,7 @@ public class Test_20260327 {
 
     /**
      * 递归无限循环跑不完，说明递归限制不够
-     * 最优的方案肯定是低于频繁解的，这也是一个限制
+     * 最优的方案肯定是优于平凡解的，这也是一个限制
      * 也可以通过业务问题推出限制
      */
     //业务题的递归优化思想
@@ -249,7 +249,7 @@ public class Test_20260327 {
             if (--map[str.charAt(i)] == 0){
                 break;
             }else {
-                minACSIndex = str.charAt(i) < str.charAt(minACSIndex) ? minACSIndex : i;
+                minACSIndex = str.charAt(i) > str.charAt(minACSIndex) ? minACSIndex : i;
             }
         }
         //上述已找到最小字典序的字符 + 后续递归结果
@@ -279,7 +279,7 @@ public class Test_20260327 {
             }
             int len = stack.length();
             //栈不空，栈顶元素 比 c 大，且 栈顶元素还会出现，三种情况下，栈顶元素可以弹出不要
-            if (len > 0 && stack.charAt(len - 1) > c && last[stack.charAt(len - 1)] > i){
+            while (len > 0 && stack.charAt(len - 1) > c && last[stack.charAt(len - 1)] > i){
                 used[stack.charAt(len - 1)] = false; //标记未使用
                 stack.deleteCharAt(len - 1); //弹出栈顶元素
             }
@@ -360,6 +360,7 @@ public class Test_20260327 {
     }
 
     //一个数组的异或和是指数数组中所有的数异或在一起的结果。给定一个数组arr，求最大子数组的异或和
+    //在数组中，子数组指的是数组中一段连续的元素
     //使用01的字典树（前缀树）
     public static int maxSubarrayXOR(int[] arr){
         if (arr == null || arr.length == 0){
@@ -368,12 +369,14 @@ public class Test_20260327 {
         TrieNode head = new TrieNode();
         insert(head,0);
         int pre = 0;
-        int res = Integer.MIN_VALUE;
-        for (int num : arr){
-            pre ^= num;
-            res = Math.max(res,query(head, num)); //query返回值是取与num最大的异或值
-            insert(head,pre); //插入此时的异或结果
+        int res = 0;
+        for (int i = 0; i < arr.length; i++) {
+            pre ^= arr[i]; //pre表示 [0~i] 的异或和
+            //假设最大异或和是[k~i],query返回值是取 [0~i] 与 [0~k] 的异或和 [k~i]
+            res = Math.max(res,query(head, pre));
+            insert(head,pre); //插入此时的[0~i]异或和
         }
+
         return res;
     }
     //01的字典树（前缀树）
@@ -385,30 +388,29 @@ public class Test_20260327 {
         //从高位到地位
         TrieNode cur = head;
         //一直从高到低搞出sum二进制所有位的前缀树出来
-        for (int i = 31; i >= 0; i++) {
-            int bit = (num >> i) & 1; //取出i位置的数
-            if (cur.children[bit] == null){
-                cur.children[bit] = new TrieNode();
+        for (int i = 31; i >= 0; i--) {
+            int path = (num >> i) & 1; //取出i位置的数
+            if (cur.children[path] == null){
+                cur.children[path] = new TrieNode();
             }
-            cur = cur.children[bit];
+            cur = cur.children[path];
         }
     }
-    //查询与 num 异或能得到的最大的数
+    //查询与 num 异或能得到的最大的异或和
     public static int query(TrieNode head, int num){
         TrieNode cur = head;
         int maxXor = 0;
-        for (int i = 31; i >= 0; i++) {
-            int bit = (num >> i) & 1; //取出i位置的数
-            int opposite = 1 - bit; //取反
+        for (int i = 31; i >= 0; i--) {
+            int path = (num >> i) & 1; //取出i位置的数
+            //最好的结果，负数找负数、正数找正数，这样异或和才最大
+            int best = i == 31 ? path : (path ^ 1); //取反
+            //实际的结果
+            best = cur.children[best] != null ? best : best ^ 1;
+            //实际的异或和
+            maxXor |= (path ^ best) << i;
+            //实际的路径往下走
+            cur = cur.children[best];
 
-            if (cur.children[opposite] != null){ //反值存在，异或值为1
-                maxXor |= i << 1; //i位置上最大的异或值增加，二进制变成1
-                cur = cur.children[opposite]; //继续往下走
-            } else if (cur.children[bit] != null) {
-                cur = cur.children[bit]; //相同的值存在，异或为0，maxXor不变，继续往下走
-            }else {
-                break;
-            }
         }
         return maxXor;
     }

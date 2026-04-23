@@ -317,7 +317,7 @@ public class Sorts {
         }
     }
     public static int[] partition(int[] arr, int L, int R){
-        int less = L -1;
+        int less = L - 1;
         int more = R;
         while (L < more){
             if (arr[L] < arr[R]){

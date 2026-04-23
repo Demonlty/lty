@@ -52,6 +52,7 @@ public class RecursionTest {
     }
 
     public static void printAllSubs(String str) {
+        //使用有效长度，去除了打印的空字符
         process(str.toCharArray(), 0, 0);  // pos: 当前考虑的位置, len: 当前有效长度
     }
     private static void process(char[] str, int i, int len) {
@@ -157,6 +158,7 @@ public class RecursionTest {
         reverseStack(stack);
         stack.push(last);
     }
+    //移除并返回栈底元素，同时保持栈中其他元素的相对顺序不变
     public static int f(Stack<Integer> stack){
         int pop = stack.pop();
         if (stack.isEmpty()){
@@ -174,6 +176,7 @@ public class RecursionTest {
     }
 
     //i位置上有多少转化方法，i位置之前的都已做好决定
+    //从左向右的尝试
     public static int process( char[] str, int i){
         if (i == str.length){
             return 1; //i位置之前的都已做好决定，i是最后一个，那方法只有一种
@@ -330,7 +333,15 @@ public class RecursionTest {
 
 //        fullArrayOfStrings("");
 //        System.out.println(win(new int[]{1, 4, 100, 5, 9}));
-        System.out.println(numToStr(2133));
+//        System.out.println(numToStr(2133));
+//        char[] chars = new char[2];
+//        chars[0] = 0;
+//        chars[1] = 1;
+//        System.out.println(chars[0]);
+//        System.out.println(chars[1]);
+//        allSubPrint1("abcd");
+//        printAllSubs("abcd");
+        fullArrayOfStrings("abcd");
     }
 
 }

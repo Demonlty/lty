@@ -9,7 +9,7 @@ public class StringTest {
     //暴力求解：O(N*M)
     //KMP算法
     public static int getIndexOf(String s, String m){
-        if (s == null || m == null || m.length() < 1 || s.length() < m.length()){
+        if (s == null || m == null || m.isEmpty() || s.length() < m.length()){
             return -1;
         }
         char[] str1 = s.toCharArray();
@@ -81,7 +81,7 @@ public class StringTest {
             return 0;
         }
         char[] str = manacherString(s);
-        int[] pArr = new int[s.length()]; //回文半径数组
+        int[] pArr = new int[str.length]; //回文半径数组
         int C = -1; //中心
         int R = -1; //0~i位置最远回文半径的右边界再往右一个位置，有边界实为R-1
         int max = Integer.MIN_VALUE; //扩充的最大值
@@ -234,7 +234,64 @@ public class StringTest {
     //定义：数组中累积和与最小值的乘积，假设叫做指标A
     //给定一个正数数组，请返回子数组中，指标A最大的值
     //左边距离最近的小的，右边距离最近的小的，单调栈
+    private static final long MOD = 1_000_000_007;
 
+    public static int maxSumMinProduct(int[] arr) {
+        int n = arr.length;
+        long[] prefix = new long[n + 1];        // 前缀和（prefix[0] = 0）
+
+        for (int i = 1; i <= n; i++) {
+            prefix[i] = prefix[i - 1] + arr[i - 1];
+        }
+
+        // left[i]：arr[i] 左边第一个严格小于 arr[i] 的位置（-1 表示没有）
+        // right[i]：arr[i] 右边第一个严格小于 arr[i] 的位置（n 表示没有）
+        int[] left = new int[n];
+        int[] right = new int[n];
+        java.util.Arrays.fill(left, -1);
+        java.util.Arrays.fill(right, n);
+
+        // 单调递增栈（存索引）
+        java.util.Deque<Integer> stack = new java.util.ArrayDeque<>();
+
+        // 1. 从左到右找 left
+        for (int i = 0; i < n; i++) {
+            while (!stack.isEmpty() && arr[stack.peek()] >= arr[i]) {
+                stack.pop();
+            }
+            if (!stack.isEmpty()) {
+                left[i] = stack.peek();
+            }
+            stack.push(i);
+        }
+
+        stack.clear();
+
+        // 2. 从右到左找 right
+        for (int i = n - 1; i >= 0; i--) {
+            while (!stack.isEmpty() && arr[stack.peek()] > arr[i]) {  // 注意这里用 > ，保证严格小于
+                stack.pop();
+            }
+            if (!stack.isEmpty()) {
+                right[i] = stack.peek();
+            }
+            stack.push(i);
+        }
+
+        long maxProduct = 0;
+
+        // 3. 对每个 i，计算以 arr[i] 为最小值的最大子数组和 * arr[i]
+        for (int i = 0; i < n; i++) {
+            // 子数组范围是 (left[i] + 1) 到 (right[i] - 1)
+            long sum = prefix[right[i]] - prefix[left[i] + 1];
+            long product = sum * arr[i];
+            if (product > maxProduct) {
+                maxProduct = product;
+            }
+        }
+
+        return (int) (maxProduct % MOD);
+    }
 
 
     public static void main(String[] args) {

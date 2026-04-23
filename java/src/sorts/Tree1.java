@@ -712,6 +712,8 @@ public class Tree1 {
         System.out.println("是否是满二叉树：" + isFBT(node));
         System.out.println("是否是平衡二叉树：" + isAVL(node));
         System.out.println("序列化：" + serialization(node));
+        System.out.println("反序列化：");
+        preOrderUnRecur(deserialize(serialization(node)));
         System.out.println("折纸："+origamiProblem(3));
     }
 

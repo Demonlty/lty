@@ -131,7 +131,7 @@ public class HashTest {
                 sizeMap.put(element,1);
             }
         }
-        //寻找顶元素
+        //寻找顶元素，寻找时更新新顶元素
         public Element<V> findHead(Element<V> element){
             Stack<Element<V>> path = new Stack<>();
             while (element != fatherMap.get(element)){
@@ -240,7 +240,7 @@ public class HashTest {
         int sum = a;
         while (b != 0){
             sum = a ^ b; //无进位相加
-            b = (a & b) >> 1; //进位信息
+            b = (a & b) << 1; //进位信息
             a = sum;
         }
         return sum;
@@ -292,10 +292,15 @@ public class HashTest {
             return 0;
         } else if (a == Integer.MIN_VALUE) {
             int res = div(add(a, 1), b);
+            //a ÷ b = (a + 1) ÷ b   +   (a -  [(a + 1) ÷ b] × b) ÷ b
             return add(res, div(minus(a, multi(res, b)), b));
         } else {
             return div(a, b);
         }
+    }
+
+    public static void main(String[] args) {
+        System.out.println(Integer.MIN_VALUE);
     }
 
 }

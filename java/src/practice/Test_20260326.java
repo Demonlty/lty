@@ -78,6 +78,7 @@ public class Test_20260326 {
     }
 
     //通过能力选工作获得钱数
+    //单调性
     public static int[] getMoneys(Job[] job, int[] ability){
         Arrays.sort(job, (a,b) -> a.hard == b.hard ? b.money - a.money : a.hard - b.hard); //排序
         //难度为K的工作，最优钱数是多少
@@ -469,7 +470,7 @@ public class Test_20260326 {
         while (left <= right) {
             int mid = left + (right - left) / 2;
 
-            if (arr[mid] > n) {
+            if (arr[mid] >= n) {
                 // 找到一个大于 n 的元素，尝试找更左边的（更小的索引）
                 result = mid;
                 right = mid - 1;
@@ -489,8 +490,7 @@ public class Test_20260326 {
 
     public static void main(String[] args) {
 
-        String[] arr = { "b\\cst", "d\\", "a\\d\\e", "a\\b\\c"};
-        print(arr);
+        System.out.println(getMax(new int[]{10, 9, 2, 5, 3, 7, 101, 18}));
     }
 
 }
